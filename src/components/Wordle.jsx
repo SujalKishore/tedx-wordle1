@@ -4,7 +4,7 @@ import Row from "./Row";
 import Keyboard from "./Keyboard";
 import { LETTERS, potentialWords } from "../data/lettersAndWords";
 
-const SOLUTION = "tirth";
+const SOLUTION = "manas";
 
 console.log(SOLUTION);
 
