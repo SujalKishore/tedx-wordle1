@@ -4,7 +4,7 @@ import Row from "./Row";
 import Keyboard from "./Keyboard";
 import { LETTERS, potentialWords } from "../data/lettersAndWords";
 
-const SOLUTION = "divas";
+const SOLUTION = "tirth";
 
 console.log(SOLUTION);
 
@@ -70,26 +70,39 @@ export default function Wordle() {
         setCorrectLetters([...SOLUTION]);
       } else {
         let correctLetters = [];
+        let presentLettersSet = new Set();
+        let absentLettersSet = new Set();
 
-        [...currentGuess].forEach((letter, index) => {
-          if (SOLUTION[index] === letter) correctLetters.push(letter);
+        const solutionLetters = [...SOLUTION];
+        const guessLetters = [...currentGuess];
+
+        // First pass: identify correct letters (matching positions)
+        guessLetters.forEach((letter, index) => {
+          if (solutionLetters[index] === letter) {
+            correctLetters.push(letter);
+            solutionLetters[index] = null; // Mark as used
+          }
+        });
+
+        // Second pass: identify present letters (letters in the word but not in the same position)
+        guessLetters.forEach((letter, index) => {
+          if (
+            solutionLetters.includes(letter) &&
+            !correctLetters.includes(letter)
+          ) {
+            presentLettersSet.add(letter);
+            solutionLetters[solutionLetters.indexOf(letter)] = null; // Mark as used
+          } else if (
+            !correctLetters.includes(letter) &&
+            !presentLettersSet.has(letter)
+          ) {
+            absentLettersSet.add(letter);
+          }
         });
 
         setCorrectLetters([...new Set(correctLetters)]);
-
-        setPresentLetters([
-          ...new Set([
-            ...presentLetters,
-            ...[...currentGuess].filter((letter) => SOLUTION.includes(letter)),
-          ]),
-        ]);
-
-        setAbsentLetters([
-          ...new Set([
-            ...absentLetters,
-            ...[...currentGuess].filter((letter) => !SOLUTION.includes(letter)),
-          ]),
-        ]);
+        setPresentLetters([...presentLettersSet]);
+        setAbsentLetters([...absentLettersSet]);
 
         setFailedGuesses([...failedGuesses, currentGuess]);
 
